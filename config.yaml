@@ -17,11 +17,33 @@ dns:
     - 1.0.0.3
   fallback:
     - 'tls://family.cloudflare-dns.com'
-    - 'https://family.cloudflare-dns.com/dns-query'
-tun:
-  enable: true
-  stack: gvisor
-  auto-route: true
+    - 'https://family.cloudflare-dns.com/dns-query
+# Removed for TProxy
+# tun:
+#   enable: true
+#   stack: gvisor
+#   auto-route: true
+# Add to your `iptable`:
+# iptables -t nat -N clash
+# iptables -t nat -A clash -d 0.0.0.0/8 -j RETURN
+# iptables -t nat -A clash -d 10.0.0.0/8 -j RETURN
+# iptables -t nat -A clash -d 127.0.0.0/8 -j RETURN
+# iptables -t nat -A clash -d 169.254.0.0/16 -j RETURN
+# iptables -t nat -A clash -d 172.16.0.0/12 -j RETURN
+# iptables -t nat -A clash -d 192.168.0.0/16 -j RETURN
+# iptables -t nat -A clash -d 224.0.0.0/4 -j RETURN
+# iptables -t nat -A clash -d 240.0.0.0/4 -j RETURN
+# iptables -t nat -A clash -d "$local_ipv4" -j RETURN
+# iptables -t nat -A clash -p tcp -j REDIRECT --to-port "$proxy_port"
+# iptables -t nat -I PREROUTING -p tcp -d 8.8.8.8 -j REDIRECT --to-port "$proxy_port"
+# iptables -t nat -I PREROUTING -p tcp -d 8.8.4.4 -j REDIRECT --to-port "$proxy_port"
+# iptables -t nat -A PREROUTING -p tcp -j clash
+# iptables -t nat -A OUTPUT -p tcp -d 198.18.0.0/16 -j REDIRECT --to-port "$proxy_port"
+# iptables -t nat -N CLASH_DNS
+# iptables -t nat -F CLASH_DNS 
+# iptables -t nat -A CLASH_DNS -p udp -j REDIRECT --to-port 1053
+# iptables -t nat -I OUTPUT -p udp --dport 53 -j CLASH_DNS
+# iptables -t nat -I PREROUTING -p udp --dport 53 -j REDIRECT --to 1053
 proxies:
   -
     name: '1'
@@ -76,21 +98,15 @@ proxies:
 proxy-groups:
   -
     name: Proxies
-    type: select
+    type: load-balance
     proxies:
       - '1'
       - '2'
       - '3'
       - '4'
       - '5'
-rule-providers:
-  private:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
-    path: ./ruleset/private.yaml
-    interval: 86400
+    url: "https://google.com.jp"
+    interval: 300
 rules:
-  - RULE-SET,private,DIRECT
   - GEOIP,LAN,DIRECT
   - MATCH,Proxies
