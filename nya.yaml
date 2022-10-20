@@ -1,0 +1,43 @@
+port: 7890
+socks-port: 7891
+redir-port: 7892
+allow-lan: true
+mode: rule
+log-level: info
+external-controller: '127.0.0.1:9090'
+secret: '233333'
+dns:
+  enable: true
+  ipv6: false
+  listen: '127.0.0.1:53'
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  nameserver:
+    - 1.1.1.3
+    - 1.0.0.3
+  fallback:
+    - 'tls://family.cloudflare-dns.com'
+    - 'https://family.cloudflare-dns.com/dns-query'
+tun:
+  enable: true
+  stack: gvisor
+  auto-route: true
+proxies:
+  -
+    name: '🥰'
+    type: vmess
+    server: iplc-hu-ri1.ddns1.pw
+    port: 10450
+    uuid: e7540fa7-e37c-3b05-851f-a0a800cd7454
+    alterId: 2
+    cipher: auto
+    udp: true
+proxy-groups:
+  -
+    name: Proxies
+    type: select
+    proxies:
+      - '🥰'
+rules:
+  - GEOIP,LAN,DIRECT
+  - MATCH,Proxies
